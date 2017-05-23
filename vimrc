@@ -1,11 +1,24 @@
-" Vundle
+""""""""""""
+" Vim Plug "
+""""""""""""
 set nocompatible " required
-filetype off
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
+
+" https://github.com/junegunn/vim-plug
+
+" Automatic install
+if !has("nvim") && empty(glob('~/.vim/autoload/plug.vim'))
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall | source $MYVIMRC
+elseif has("nvim") && empty(glob('~/.config/nvim/autoload/plug.vim'))
+    silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
+
+" Start plugin manager
+ call plug#begin('~/.vim/plugged')
+
 """""""""""
 " Plugins "
 """""""""""
@@ -14,42 +27,43 @@ Plugin 'VundleVim/Vundle.vim'
 " Editing "
 """""""""""
 " Server auto complete < no dependent files
-Plugin 'ervandew/supertab'
+Plug 'ervandew/supertab'
 
 """"""""""""""
 " Commenting "
 """"""""""""""
-Plugin 'scrooloose/nerdcommenter'
+Plug 'scrooloose/nerdcommenter'
+
+"""""""""""""
+" Syntastic "
+"""""""""""""
+Plug 'scrooloose/syntastic'
 
 """""""""""
 " Styling "
 """""""""""
 " Monokai
-Plugin 'sickill/vim-monokai'
-
-" CoffeeScript
-Plugin 'kchmck/vim-coffee-script'
-
-" CJSX
-Plugin 'mtscout6/vim-cjsx'
+Plug 'sickill/vim-monokai'
 
 " Stylus
-Plugin 'wavded/vim-stylus'
+Plug 'wavded/vim-stylus'
 
 " Elm
-Plugin 'elmcast/elm-vim'
+Plug 'elmcast/elm-vim'
+
+" LightLine
+Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
 
 """"""""""""""""""""
 " Navigation Tools "
 """"""""""""""""""""
 " plugin to control p
-Plugin 'ctrlpvim/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 " plugin to speed up control p
-Plugin 'FelikZ/ctrlp-py-matcher'
+Plug 'FelikZ/ctrlp-py-matcher'
 
-" All of your Plugins must be added before the following line
-call vundle#end() " required
-filetype plugin indent on " required
+" Add plugins to &runtimepath
+call plug#end()
 
 "Colors
 syntax enable
@@ -95,9 +109,19 @@ nnoremap <Leader>w :w<CR>
 " elm formatting
 let g:elm_format_autosave = 1
 let g:elm_make_show_warnings = 1
+"" new stuff for elm, trying
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:elm_syntastic_show_warnings = 1
+""
 nnoremap <Leader>m :ElmMake<CR>
 nnoremap <Leader>e :ElmErrorDetail<CR>
 
+"""""""""""""""""""""""
+" Copying and pasting "
+"""""""""""""""""""""""
+" Reselecting Pasted text
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 "Paste toggle
 set pastetoggle=<F2>
 
@@ -138,3 +162,34 @@ function! <SID>StripTrailingWhitespaces()
     call cursor(l, c)
 endfunction
 autocmd BufWritePre *.py,*.js,*.coffee :call <SID>StripTrailingWhitespaces()
+
+"""""""""""""
+" Syntastic "
+"""""""""""""
+if !has('nvim') " for syntastic use f12
+    let g:syntastic_mode_map = { 'mode': 'active' }
+    nnoremap <F10> :SyntasticToggleMode<CR>
+    nnoremap <F12> :update<CR>:SyntasticCheck<CR>  " Toggles Syntax check
+
+    " Fun styling for syntastic
+    let g:syntastic_error_symbol = '❌'
+    let g:syntastic_style_error_symbol = '⁉️'
+    let g:syntastic_warning_symbol = '⚠️'
+    let g:syntastic_style_warning_symbol = '💩'
+
+    " Ignore Errors
+    let g:syntastic_python_checkers = ["flake8"]
+    let g:syntastic_python_flake8_args = '--max-line-length=200 --ignore=W391'
+endif
+
+"""""""""""
+" Airline "
+"""""""""""
+" For Airline
+set laststatus=2
+
+" For Airline
+let g:airline_powerline_fonts = 1
+
+" For TMUX plugin
+let g:tmuxline_powerline_separators = 1
