@@ -55,6 +55,13 @@ else
     Plug 'neomake/neomake'
 endif
 
+""""""""""""""""
+" Autocomplete "
+""""""""""""""""
+Plug 'roxma/nvim-completion-manager'
+" (optional) javascript completion
+Plug 'roxma/nvim-cm-tern',  {'do': 'npm install'}
+
 """""""""""
 " Styling "
 """""""""""
